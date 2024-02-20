@@ -22,95 +22,76 @@ in: [
 """
 -------------------------------DON'T DO THIS-------------------------------
 """
-def get_portfolio_value_without_strategy(data: list, money: int) -> int:
-    stock_portfolio = {}
-    stock_prices = {}
-    portfolio_value = money
-
+def in_memory_store_no_strategy(data: list) -> dict:
+    store = {}
     for command in data:
-        action = command.split()[0]
-        if action == "SET":
-            stock = command.split()[1]
-            price = command.split()[2]
-            stock_prices[stock] = price
-        elif action == "BUY":
-            stock = command.split() [1]
-            quantity = command.split()[2]
-            stock_portfolio[stock] = stock_portfolio.get(stock, 0) + int(quantity)
-            portfolio_value -= int(stock_prices[stock]) * int(quantity)
-        elif action == "SELL":
-            stock = command.split()[1]
-            quantity = command.split()[2]
-            stock_portfolio[stock] = stock_portfolio.get(stock, 0) - int(quantity)
-            portfolio_value += int(stock_prices[stock]) * int(quantity)
-
-    for stock in stock_portfolio:
-        portfolio_value += int(stock_prices[stock]) * stock_portfolio[stock]
-
-    return portfolio_value
-
-
+        action, *args = command.split()
+        if action == "ADD":
+            key, value = args
+            store[key] = value
+        elif action == "GET":
+            key = args[0]
+            print(store[key])
+        elif action == "DELETE":
+            key = args[0]
+            del store[key]
+        elif action == "UPDATE":
+            key, value = args
+            store[key] = value
+    return store
 """
 -------------------------------DO THIS INSTEAD-------------------------------
 """
 from abc import ABC, abstractmethod
 
 
-class TradeStrategy(ABC):
-
+class CommandStrategy(ABC):
     @abstractmethod
-    def execute(self, command: str, stock_portfolio: dict, stock_prices: dict, portfolio_value: int) -> int:
+    def execute(self, store: dict, *args):
         pass
 
+class AddCommand(CommandStrategy):
+    def execute(self, store: dict, *args):
+        key, value = args
+        store[key] = value
 
-class SetStrategy(TradeStrategy):
-
-    def execute(self, command: str, stock_portfolio: dict, stock_prices: dict, portfolio_value: int) -> int:
-        _, stock, price = command.split()
-        stock_prices[stock] = int(price)
-        return portfolio_value
-
-
-class BuyStrategy(TradeStrategy):
-
-    def execute(self, command: str, stock_portfolio: dict, stock_prices: dict, portfolio_value: int) -> int:
-        _, stock, quantity = command.split()
-        stock_portfolio[stock] = stock_portfolio.get(stock, 0) + int(quantity)
-        portfolio_value -= int(stock_prices[stock]) * int(quantity)
-        return portfolio_value
+class GetCommand(CommandStrategy):
+    def execute(self, store: dict, *args):
+        key = args[0]
+        print(store[key])
 
 
-class SellStrategy(TradeStrategy):
-        
-    def execute(self, command: str, stock_portfolio: dict, stock_prices: dict, portfolio_value: int) -> int:
-        _, stock, quantity = command.split()
-        stock_portfolio[stock] = stock_portfolio.get(stock, 0) - int(quantity)
-        portfolio_value += int(stock_prices[stock]) * int(quantity)
-        return portfolio_value
+class DeleteCommand(CommandStrategy):
+    def execute(self, store: dict, *args):
+        key = args[0]
+        del store[key]
 
+class UpdateCommand(CommandStrategy):
+    def execute(self, store: dict, *args):
+        key, value = args
+        store[key] = value
 
-TRADE_STRATEGIES = {
-    "SET": SetStrategy(),
-    "BUY": BuyStrategy(),
-    "SELL": SellStrategy()
-}
+class CommandContext:
+    def __init__(self):
+        self.store = {}
+        self.commands = {
+            "ADD": AddCommand(),
+            "GET": GetCommand(),
+            "DELETE": DeleteCommand(),
+            "UPDATE": UpdateCommand()
+        }
 
+    def execute_command(self, command: str, *args):
+        self.commands[command].execute(self.store, *args)
 
-def get_portfolio_value_with_strategy(data: list, money: int) -> int:
-    stock_portfolio = {}
-    stock_prices = {}
-    portfolio_value = money
+    def get_store(self):
+        return self.store
 
+def in_memory_store_with_strategy(data: list) -> dict:
+    context = CommandContext()
     for command in data:
-        action = command.split()[0]
+        action, *args = command.split()
+        context.execute_command(action, *args)
+    return context.get_store()
 
-        # One liner to execute strategy
-        portfolio_value = TRADE_STRATEGIES[action].execute(command, stock_portfolio, stock_prices, portfolio_value)
-
-    for stock in stock_portfolio:
-        portfolio_value += int(stock_prices[stock]) * stock_portfolio[stock]
-
-    return portfolio_value
-
-
-# print(get_portfolio_value(["SET AAPL 50", "SET GOOG 50", "BUY GOOG 10", "SET GOOG 30","SELL GOOG 10", "SET GOOG 10"], 1000))
+print(in_memory_store_with_strategy(["ADD dog sophie", "ADD cat leon", "GET dog", "GET cat", "DELETE dog", "UPDATE cat leonardo"]))
