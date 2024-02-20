@@ -50,10 +50,12 @@ class CommandStrategy(ABC):
     def execute(self, store: dict, *args):
         pass
 
+
 class AddCommand(CommandStrategy):
     def execute(self, store: dict, *args):
         key, value = args
         store[key] = value
+
 
 class GetCommand(CommandStrategy):
     def execute(self, store: dict, *args):
@@ -66,10 +68,12 @@ class DeleteCommand(CommandStrategy):
         key = args[0]
         del store[key]
 
+
 class UpdateCommand(CommandStrategy):
     def execute(self, store: dict, *args):
         key, value = args
         store[key] = value
+
 
 class CommandContext:
     def __init__(self):
@@ -87,11 +91,13 @@ class CommandContext:
     def get_store(self):
         return self.store
 
+
 def in_memory_store_with_strategy(data: list) -> dict:
-    context = CommandContext()
+    context = CommandContext() # If you're low on time, don't need to do Context layer.
     for command in data:
         action, *args = command.split()
         context.execute_command(action, *args)
     return context.get_store()
+
 
 print(in_memory_store_with_strategy(["ADD dog sophie", "ADD cat leon", "GET dog", "GET cat", "DELETE dog", "UPDATE cat leonardo"]))
