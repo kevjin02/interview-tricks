@@ -38,6 +38,8 @@ def in_memory_store_no_strategy(data: list) -> dict:
             key, value = args
             store[key] = value
     return store
+
+
 """
 -------------------------------DO THIS INSTEAD-------------------------------
 """
