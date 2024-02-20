@@ -101,4 +101,11 @@ def in_memory_store_with_strategy(data: list) -> dict:
     return context.get_store()
 
 
-print(in_memory_store_with_strategy(["ADD dog sophie", "ADD cat leon", "GET dog", "GET cat", "DELETE dog", "UPDATE cat leonardo"]))
+print(in_memory_store_with_strategy([
+    "ADD dog sophie",
+    "ADD cat leon",
+    "GET dog",
+    "GET cat",
+    "DELETE dog",
+    "UPDATE cat leonardo"
+    ]))
