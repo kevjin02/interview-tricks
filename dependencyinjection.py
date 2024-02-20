@@ -19,6 +19,6 @@ def how_long_is_hello_world() -> int:
     return count_letters(hello_world)
 
 """
-Sometimes, it's wayy easier to have nested functions (i.e. depth-first search).
+Sometimes, it's wayy easier to have nested functions (i.e. depth-first search, most recursion) than not.
 Implement it that way first, then see if you can refactor it to be more maintainable.
 """

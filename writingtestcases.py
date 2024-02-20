@@ -21,6 +21,7 @@ def test_len_of_list():
 
 """
 In an interview, you can do this more informally
+(no function name, "print" instead of "assert")
 """
 
 test_list = [1, 2, 3, 4, 5]
