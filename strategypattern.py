@@ -15,7 +15,6 @@ in: [
     {intent: "show_hours"},
     {intent: "process_allergies", entities: {allergies: ["peanuts", "shellfish"]}}
 ]
-
 """
 
 
